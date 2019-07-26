@@ -1,35 +1,55 @@
 #!/usr/bin/env ruby
 
+# comments!
 def hi(name = 'World')
   puts "Hello #{name.capitalize}!"
 end
 
 hi "ricardo"
 
-class Greeter
-  attr_accessor :name
+class MegaGreeter
+  attr_accessor :names
 
-  def initialize(name = 'World')
-    @name = name
+  def initialize(names = 'World')
+    @names = names
   end
 
   def say_hi
-    puts "Hi #{@name.capitalize}!"
+    if @names.nil?
+      puts "..."
+    elsif @names.respond_to?"each"
+      @names.each do |name|  # lambda!
+        puts "Hello #{name}!"
+      end
+    else
+      puts "Hello #{@names}"
+    end
   end
 
   def say_bye
-    puts "Bye #{@name.capitalize}, come back soon."
+    if @names.nil?
+      puts "..."
+    elsif @names.respond_to?("join")
+      # Join the list elements with commas
+      puts "Goodbye #{@names.join(", ")}.  Come back soon!"
+    else
+      puts "Goodbye #{@names}.  Come back soon!"
+    end
   end
 end
 
-greeter = Greeter.new("rita")
 
-greeter.say_hi
+# if __name__ == '__main__'
+if __FILE__ == $0
+  greeter = MegaGreeter.new("rita")
 
-greeter.say_bye
+  greeter.say_hi
 
-puts greeter.name
+  greeter.say_bye
 
-greeter.name = 'ricardo'
+  puts greeter.names
 
-puts greeter.name
+  greeter.names = 'ricardo'
+
+  puts greeter.names
+end
