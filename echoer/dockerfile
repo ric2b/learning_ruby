@@ -1,8 +1,15 @@
-FROM ruby:2.6-alpine
+FROM ruby:2.6
+
+# COPY .bundle/ /usr/local/bundle/
+# COPY vendor/cache vendor/cache
+COPY Gemfile Gemfile.lock ./
+# RUN bundler install --local
+RUN bundler install
 
 RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
-COPY src/ .
+COPY src/ src/
+COPY test/ test/
 
-CMD ruby ./main.rb
-
+# CMD ruby ./main.rb
+CMD ruby test/test_main.rb
