@@ -1,12 +1,13 @@
 #!/usr/bin/env ruby
 require 'bunny'
+require 'pg'
 
 def send(message)
-  connection = Bunny.new(hostname: ENV['BROKER_HOSTNAME'] || 'localhost')
+  broker_connection = Bunny.new(hostname: ENV['BROKER_HOSTNAME'] || 'localhost')
 
   attempts = 0
   begin
-    connection.start
+    broker_connection.start
   rescue Bunny::TCPConnectionFailed
     $stdout.flush
     sleep(2**attempts)
@@ -14,29 +15,40 @@ def send(message)
     raise IOError("Unable to connect")
   end
 
-  channel = connection.create_channel
+  channel = broker_connection.create_channel
   queue = channel.queue('hello')
   channel.default_exchange.publish('Hello World!', routing_key: queue.name)
   puts " [x] Sent 'Hello World!'"
 
-  connection.close
+  broker_connection.close
 end
 
 def receive
-  connection = Bunny.new(hostname: ENV['BROKER_HOSTNAME'] || 'localhost')
-  connection.start
+  broker_connection = Bunny.new(hostname: ENV['BROKER_HOSTNAME'] || 'localhost')
+  broker_connection.start
 
-  channel = connection.create_channel
+  channel = broker_connection.create_channel
   queue = channel.queue('hello')
   puts ' [*] Waiting for message.'
   queue.subscribe(block: true) do |_delivery_info, _properties, body|
     puts " [x] Received message: #{body}"
-    connection.close
+    write_to_db(body)
+    broker_connection.close
   end
+end
+
+def write_to_db(message)
+  db_connection = PG.connect(:host => ENV['DB_HOSTNAME'] || 'localhost', :user => 'postgres', :password => ENV['DB_PASSWORD'] || 'password')
+  db_connection.exec('CREATE TABLE received(body TEXT);')
+  db_connection.exec("INSERT INTO received VALUES('#{message}');")
+
+  db_connection.close
+
+  puts " [x] Wrote to db: #{message}"
 end
 
 if __FILE__ == $0
   puts 'starting'
   send 'hello bunny'
-  puts "received: #{receive}"
+  receive
 end

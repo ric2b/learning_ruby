@@ -5,6 +5,7 @@ GEM
     bunny (2.14.2)
       amq-protocol (~> 2.3, >= 2.3.0)
     minitest (5.11.3)
+    pg (1.1.4)
 
 PLATFORMS
   ruby
@@ -12,6 +13,7 @@ PLATFORMS
 DEPENDENCIES
   bunny
   minitest
+  pg
 
 BUNDLED WITH
    1.17.3

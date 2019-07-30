@@ -5,10 +5,16 @@ services:
         build: .
         environment:
             - BROKER_HOSTNAME=rabbitmq
+            - DB_HOSTNAME=postgres
+            - DB_PASSWORD=password
         depends_on:
             - rabbitmq
+            - postgres
 
     rabbitmq:
         image: "rabbitmq"
-        ports:
-            - "5672:5672"
+
+    postgres:
+        image: "postgres"
+        environment:
+            - POSTGRES_PASSWORD=password
