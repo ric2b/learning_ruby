@@ -8,8 +8,6 @@ RUN bundler install
 
 RUN mkdir /usr/src/app
 WORKDIR /usr/src/app
-COPY src/ src/
-COPY test/ test/
+COPY src/ .
 
-# CMD ruby ./main.rb
-CMD ruby test/test_main.rb
+CMD ruby ./main.rb

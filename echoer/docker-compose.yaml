@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+    echoer:
+        build: .
+        environment:
+            - BROKER_HOSTNAME=rabbitmq
+        depends_on:
+            - rabbitmq
+
+    rabbitmq:
+        image: "rabbitmq"
+        ports:
+            - "5672:5672"
